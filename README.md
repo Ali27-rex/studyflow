@@ -1,38 +1,86 @@
-# StudyFlow
-Flask study assistant for extracting notes, summaries, document questions, and quizzes.
+# StudyFlow — Document Study Assistant
 
-## Upload to GitHub
-1. Extract this ZIP and open the studyflow folder.
-2. Create a private GitHub repository named studyflow.
-3. Use Add file > Upload files. Upload the contents of studyflow, including Dockerfile and .gitignore, at the repository root. Do not upload the ZIP itself.
-4. Commit the files. GitHub stores code; GitHub Pages cannot run this Flask application.
+StudyFlow helps students turn uploaded study materials into summaries, answers, and quizzes. It combines document processing and image OCR with a browser-based study interface.
 
-## Run on Windows
-Install Python, then run in PowerShell from this folder:
+## Try the Project
+
+- **Live demo:** https://studyflow-q0ib.onrender.com/
+- **Source code:** https://github.com/Ali27-rex/studyflow
+
+The free demo may take around a minute to wake up after inactivity. Accounts and uploaded documents may be cleared when the hosting service restarts. Please use sample documents when testing.
+
+## Features
+
+- User registration and login with hashed passwords
+- Upload PDF, DOCX, EPUB, TXT, and image files
+- Extract text from images using Tesseract OCR
+- Generate extractive summaries
+- Ask questions about uploaded documents
+- Generate multiple-choice quizzes
+- View saved documents and chat history
+- Delete uploaded documents
+
+## Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python and Flask | Backend and application routes |
+| SQLite | Accounts, documents, quizzes, and chat history |
+| Werkzeug | Password hashing and filename handling |
+| PyPDF2 | PDF text extraction |
+| python-docx | Word document processing |
+| Pillow and pytesseract | Image processing and OCR |
+| ebooklib | EPUB processing |
+| BeautifulSoup and lxml | Content parsing |
+| requests | External API request support |
+| HTML, CSS, and JavaScript | User interface |
+| Docker and Gunicorn | Deployment and application serving |
+| Render | Live demo hosting |
+
+## Run Locally
+
+Install Python, download or clone the repository, and open a terminal in the project folder.
+
+Install dependencies:
+
 ```powershell
 python -m pip install -r requirements.txt
+```
+
+Start the application:
+
+```powershell
 python app.py
 ```
-Open http://127.0.0.1:5000.
-Image OCR also requires the Tesseract Windows program: https://github.com/UB-Mannheim/tesseract/wiki
-If needed, before starting the app:
+
+Open http://127.0.0.1:5000 in your browser.
+
+### Image OCR on Windows
+
+Install Tesseract from:
+https://github.com/UB-Mannheim/tesseract/wiki
+
+If Tesseract is not available in your PATH, set its location before starting the app:
+
 ```powershell
 $env:TESSERACT_CMD = "C:\Program Files\Tesseract-OCR\tesseract.exe"
+python app.py
 ```
-PDF extraction reads embedded text; scanned PDFs are not OCR-enabled in this version.
-The optional .env.example documents variables; the app does not automatically load .env files.
 
-## Render Docker deployment
-1. Connect the repository to a new Render Web Service.
-2. Select Docker as the runtime. The Dockerfile installs Tesseract automatically.
-3. Set SECRET_KEY to a long random value and COOKIE_SECURE to true in the service environment settings.
-4. Deploy. Database tables initialize on startup, including when Gunicorn imports the app.
-5. Test registration, TXT upload, summary, chat, quiz, and image OCR.
+## Deployment
 
-Free Render hosting is suitable for a demo only: its local database and uploads can disappear on restart, spin-down, or redeployment. It also sleeps when idle. This package does not configure external storage.
-For persistent operation on a paid Render service, attach a disk at /app/data and set DATA_DIR=/app/data. Back up that directory separately.
-Do not point your main domain at this demo if it already serves another website. Connect a separate subdomain only after deployment is working.
+The included Dockerfile installs the Python dependencies and Tesseract, then serves the application through Gunicorn.
 
-## Data and limitations
-This archive excludes the supplied database, uploaded image, and editor configuration. New accounts start with a clean database. Files are stored in data/uploads outside the public static directory. Failed extraction is reported as an error rather than saved as successful content.
-Use a stable SECRET_KEY for hosting; without one, restarting the app invalidates sessions. Local mode uses extractive heuristics, not an external large language model. This is a starter project; public use with sensitive documents needs further review, including CSRF protection, upload validation, resource limits, and backups.
+For HTTPS hosting, set:
+
+- `SECRET_KEY`: a stable, private random value
+- `COOKIE_SECURE`: `true`
+
+Persistent hosting requires storage for the database and uploaded files. Configure `DATA_DIR` to point to the persistent storage directory.
+
+## Current Limitations
+
+- Summaries and answers use extractive and keyword-based methods in local mode; they can be incomplete or inaccurate.
+- PDF processing extracts embedded text. Scanned PDFs do not currently use OCR.
+- Free demo storage is temporary.
+- The application needs further security and reliability improvements before use with sensitive documents.
