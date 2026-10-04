@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}StudyFlow — AI Study Assistant{% endblock %}
+
+{% block public_content %}
+<style>
+    .hero-section {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-grid {
+        position: absolute;
+        inset: 0;
+        background-image: 
+            linear-gradient(rgba(79,70,229,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79,70,229,0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(ellipse at center, black 40%, transparent 70%);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(79, 70, 229, 0.08);
+        border: 1px solid rgba(79, 70, 229, 0.15);
+        border-radius: 100px;
+        font-size: 0.85rem;
+        color: var(--accent);
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .hero-badge::before {
+        content: '';
+        width: 8px; height: 8px;
+        background: var(--success);
+        border-radius: 50%;
+        animation: pulse-soft 2s infinite;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 540px;
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 64px;
+    }
+
+    .hero-visual {
+        position: relative;
+        height: 500px;
+    }
+
+    .floating-card {
+        position: absolute;
+        background: white;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-lg);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-card:nth-child(1) {
+        top: 10%; left: 10%;
+        width: 280px;
+        animation-delay: 0s;
+    }
+
+    .floating-card:nth-child(2) {
+        top: 40%; right: 5%;
+        width: 240px;
+        animation-delay: -2s;
+        border-radius: var(--radius-asymmetric);
+    }
+
+    .floating-card:nth-child(3) {
+        bottom: 10%; left: 20%;
+        width: 260px;
+        animation-delay: -4s;
+    }
+
+    .feature-section {
+        padding: 120px 0;
+    }
+
+    .feature-card {
+        padding: 40px 32px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        background: var(--bg-surface);
+        transition: all 0.4s var(--transition-smooth);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--accent), var(--warning));
+        transform: scaleX(0);
+        transition: transform 0.4s var(--transition-smooth);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--border-strong);
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-icon-box {
+        width: 48px; height: 48px;
+        border-radius: var(--radius-md);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .feature-icon-box::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: inherit;
+        border: 2px dashed var(--border-subtle);
+        animation: spin-slow 20s linear infinite;
+    }
+
+    .feature-card:hover .feature-icon-box::after {
+        border-color: var(--accent);
+        animation-duration: 10s;
+    }
+
+    .step-section {
+        padding: 80px 0;
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .step-number {
+        font-family: 'Space Grotesk';
+        font-size: 5rem;
+        font-weight: 700;
+        color: var(--border-strong);
+        line-height: 1;
+        margin-bottom: 16px;
+        transition: color 0.3s;
+    }
+
+    .step-item:hover .step-number {
+        color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+        .hero-title { font-size: 2.5rem; }
+        .hero-visual { display: none; }
+        .hero-cta { flex-direction: column; }
+    }
+</style>
+
+<section class="hero-section">
+    <div class="hero-grid"></div>
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-badge reveal reveal-delay-1">
+                    <span>Local AI Mode — No API Key Needed</span>
+                </div>
+                <h1 class="hero-title reveal reveal-delay-2">
+                    Study smarter.<br>
+                    <span class="text-gradient">Not harder.</span>
+                </h1>
+                <p class="hero-subtitle reveal reveal-delay-3">
+                    Upload your lecture notes. Get instant summaries, ask questions naturally, and generate quizzes from your actual content — all offline.
+                </p>
+                <div class="hero-cta reveal reveal-delay-4">
+                    <a href="{{ url_for('register') }}" class="sf-btn sf-btn-primary sf-btn-lg">
+                        <span>Start Learning</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="sf-btn sf-btn-secondary sf-btn-lg">
+                        <i class="fas fa-play"></i>
+                        <span>Sign In</span>
+                    </a>
+                </div>
+
+                <div class="reveal reveal-delay-5" style="display: flex; gap: 32px; opacity: 0.7;">
+                    <div>
+                        <div style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700;">100%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Offline</div>
+                    </div>
+                    <div style="width: 1px; background: var(--border-subtle);"></div>
+                    <div>
+                        <div style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700;">PDF</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Native Support</div>
+                    </div>
+                    <div style="width: 1px; background: var(--border-subtle);"></div>
+                    <div>
+                        <div style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700;">AI</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Powered</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual d-none d-lg-block">
+                    <div class="floating-card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 32px; height: 32px; background: #fef2f2; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--danger);">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">Lecture_Notes_Week_5.pdf</div>
+                        </div>
+                        <div style="height: 4px; background: var(--border-subtle); border-radius: 2px; margin-bottom: 8px; overflow: hidden;">
+                            <div style="width: 70%; height: 100%; background: var(--accent); border-radius: 2px; animation: shimmer 2s infinite;"></div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Extracting text content...</div>
+                    </div>
+
+                    <div class="floating-card">
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 12px;">AI Summary</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                            Key concepts: Virtualization, Hypervisors, Containerization...
+                        </div>
+                        <div style="margin-top: 12px; display: flex; gap: 8px;">
+                            <span class="sf-badge sf-badge-primary">5 Key Terms</span>
+                            <span class="sf-badge sf-badge-success">3 Sections</span>
+                        </div>
+                    </div>
+
+                    <div class="floating-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <span style="font-weight: 600; font-size: 0.9rem;">Quiz Generated</span>
+                            <span class="sf-badge sf-badge-success">4/5 Correct</span>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <div style="flex: 1; height: 8px; background: var(--success); border-radius: 4px;"></div>
+                            <div style="flex: 1; height: 8px; background: var(--success); border-radius: 4px;"></div>
+                            <div style="flex: 1; height: 8px; background: var(--success); border-radius: 4px;"></div>
+                            <div style="flex: 1; height: 8px; background: var(--success); border-radius: 4px;"></div>
+                            <div style="flex: 1; height: 8px; background: var(--border-subtle); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="feature-section">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Everything you need<br>to ace your exams</h2>
+            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">Built for students who want to actually understand their materials, not just memorize them.</p>
+        </div>
+
+        <div class="row g-4 stagger-children">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-box" style="background: #eff6ff; color: #3b82f6;">
+                        <i class="fas fa-file-arrow-up"></i>
+                    </div>
+                    <h4 style="margin-bottom: 12px;">PDF Upload</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Drop your lecture notes. We support PDF, DOCX, TXT, EPUB, and even images with OCR.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-box" style="background: #f5f3ff; color: #8b5cf6;">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h4 style="margin-bottom: 12px;">Smart Summaries</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">AI identifies key terms, important sentences, and document structure from your actual text.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-box" style="background: #ecfdf5; color: #10b981;">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4 style="margin-bottom: 12px;">Q&A Chat</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Ask questions in natural language. Get answers extracted directly from your uploaded documents.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-box" style="background: #fffbeb; color: #f59e0b;">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h4 style="margin-bottom: 12px;">Auto Quizzes</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Generate fill-in-the-blank and comprehension questions using real terms from your notes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="step-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <h2 class="reveal" style="font-size: 2.5rem; margin-bottom: 24px;">How it works</h2>
+                <p class="reveal reveal-delay-1" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.7;">
+                    No complicated setup. No API keys to configure. Just upload and start learning in seconds.
+                </p>
+            </div>
+            <div class="col-lg-6 offset-lg-1">
+                <div class="stagger-children">
+                    <div class="step-item" style="display: flex; gap: 24px; margin-bottom: 40px;">
+                        <div class="step-number">01</div>
+                        <div>
+                            <h4 style="margin-bottom: 8px;">Upload Your Notes</h4>
+                            <p style="color: var(--text-muted); line-height: 1.6;">Simply drag and drop your PDF lecture notes or study materials into the upload zone.</p>
+                        </div>
+                    </div>
+                    <div class="step-item" style="display: flex; gap: 24px; margin-bottom: 40px;">
+                        <div class="step-number">02</div>
+                        <div>
+                            <h4 style="margin-bottom: 8px;">AI Processes Content</h4>
+                            <p style="color: var(--text-muted); line-height: 1.6;">Our local NLP engine extracts text, identifies key concepts, and builds a knowledge graph.</p>
+                        </div>
+                    </div>
+                    <div class="step-item" style="display: flex; gap: 24px;">
+                        <div class="step-number">03</div>
+                        <div>
+                            <h4 style="margin-bottom: 8px;">Study Smarter</h4>
+                            <p style="color: var(--text-muted); line-height: 1.6;">Read summaries, ask questions, and take auto-generated quizzes tailored to your content.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 100px 0; text-align: center;">
+    <div class="container">
+        <div class="reveal" style="max-width: 600px; margin: 0 auto;">
+            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--accent), #8b5cf6); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto 32px; color: white; font-size: 1.5rem; transform: rotate(-5deg);">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Ready to study smarter?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1.1rem;">Join students using StudyFlow to actually understand their course materials.</p>
+            <a href="{{ url_for('register') }}" class="sf-btn sf-btn-primary sf-btn-lg">
+                <span>Get Started Free</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

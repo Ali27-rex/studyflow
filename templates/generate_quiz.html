@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Quiz — {{ document.original_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center reveal">
+    <div class="col-md-6">
+        <nav style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-muted);">
+            <a href="{{ url_for('dashboard') }}" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+            <i class="fas fa-chevron-right" style="margin: 0 8px; font-size: 0.7rem;"></i>
+            <a href="{{ url_for('view_document', doc_id=document.id) }}" style="color: var(--text-muted); text-decoration: none;">{{ document.original_name }}</a>
+            <i class="fas fa-chevron-right" style="margin: 0 8px; font-size: 0.7rem;"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Generate Quiz</span>
+        </nav>
+
+        <div class="sf-card">
+            <div style="padding: 48px 40px; text-align: center;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #fef3c7, #fffbeb); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: var(--warning); font-size: 2rem; position: relative;">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <div style="position: absolute; inset: -6px; border: 2px dashed var(--warning); border-radius: inherit; opacity: 0.3; animation: spin-slow 15s linear infinite;"></div>
+                </div>
+
+                <h3 style="margin-bottom: 12px; font-weight: 600;">Generate Quiz</h3>
+                <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem;">AI will create questions from your actual document content using local NLP.</p>
+
+                <span class="sf-badge sf-badge-primary" style="margin-bottom: 32px; display: inline-flex;">
+                    <i class="fas fa-microchip" style="font-size: 0.6rem;"></i>
+                    Local AI Mode
+                </span>
+
+                <div class="alert" style="background: #eff6ff; border: 1px solid #dbeafe; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 32px; text-align: left; display: flex; align-items: flex-start; gap: 12px; color: #1e40af;">
+                    <i class="fas fa-circle-info" style="margin-top: 2px;"></i>
+                    <span style="font-size: 0.85rem; line-height: 1.6;">The AI finds key terms in your document and creates fill-in-the-blank and comprehension questions using your actual content.</span>
+                </div>
+
+                <form method="POST" action="{{ url_for('generate_quiz_route', doc_id=document.id) }}" id="quizForm">
+                    <div class="sf-form-group" style="text-align: left;">
+                        <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+                            <i class="fas fa-list-ol" style="margin-right: 6px;"></i>
+                            Number of Questions
+                        </label>
+                        <select name="num_questions" class="sf-input" style="cursor: pointer;">
+                            <option value="3">3 Questions — Quick Review</option>
+                            <option value="5" selected>5 Questions — Standard</option>
+                            <option value="10">10 Questions — Comprehensive</option>
+                        </select>
+                    </div>
+
+                    <div id="quizLoading" style="display: none; padding: 20px;">
+                        <div style="width: 48px; height: 48px; border: 3px solid var(--border-subtle); border-top-color: var(--warning); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                        <p style="font-weight: 600;">Analyzing document content...</p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Extracting key terms and generating questions</p>
+                    </div>
+
+                    <button type="submit" class="sf-btn sf-btn-warning w-100 py-3" id="quizSubmitBtn" style="margin-top: 8px;">
+                        <i class="fas fa-bolt"></i>
+                        <span>Generate Quiz from Document</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('quizForm').addEventListener('submit', function() {
+    document.getElementById('quizSubmitBtn').style.display = 'none';
+    document.getElementById('quizLoading').style.display = 'block';
+});
+</script>
+{% endblock %}

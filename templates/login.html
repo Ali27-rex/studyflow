@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — StudyFlow{% endblock %}
+
+{% block public_content %}
+<style>
+    .auth-layout {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+        position: relative;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        padding: 48px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 4px;
+        background: linear-gradient(90deg, var(--accent), #8b5cf6, var(--warning));
+        background-size: 200% 100%;
+        animation: shimmer 3s infinite linear;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .auth-logo {
+        width: 48px; height: 48px;
+        background: var(--accent);
+        border-radius: var(--radius-asymmetric);
+        display: flex; align-items: center; justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin: 0 auto 16px;
+        transform: rotate(-3deg);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+</style>
+
+<div class="auth-layout">
+    <div class="auth-card reveal">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <h3 style="margin-bottom: 8px;">Welcome back</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Sign in to access your study materials</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="sf-form-group">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Username</label>
+                <input type="text" name="username" class="sf-input" placeholder="Enter your username" required>
+            </div>
+
+            <div class="sf-form-group">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Password</label>
+                <input type="password" name="password" class="sf-input" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="sf-btn sf-btn-primary w-100 py-3" style="margin-top: 8px;">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? 
+            <a href="{{ url_for('register') }}" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create one</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

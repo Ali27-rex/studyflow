@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.original_name }} — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="reveal">
+    <nav style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-muted);">
+        <a href="{{ url_for('dashboard') }}" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+        <i class="fas fa-chevron-right" style="margin: 0 8px; font-size: 0.7rem;"></i>
+        <span style="color: var(--text-primary); font-weight: 500;">{{ document.original_name }}</span>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="sf-card">
+                <div class="sf-card-header" style="background: linear-gradient(135deg, #fef2f2, #fff5f5);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: white; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: {{ file_color }}; box-shadow: var(--shadow-sm);">
+                            <i class="fas {{ file_icon }}"></i>
+                        </div>
+                        <div>
+                            <h5 style="margin: 0; font-weight: 600; font-size: 1rem;">{{ document.original_name }}</h5>
+                            <span class="sf-badge sf-badge-success" style="margin-top: 4px;">
+                                <i class="fas fa-check-circle" style="font-size: 0.6rem;"></i>
+                                Processed
+                            </span>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                        {{ document.extracted_text|length }} chars
+                    </div>
+                </div>
+                <div style="padding: 24px; max-height: 70vh; overflow-y: auto;">
+                    <div class="text-content">{{ document.extracted_text }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sf-card mb-4">
+                <div class="sf-card-header">
+                    <h6 style="margin: 0; font-weight: 600;">Quick Actions</h6>
+                </div>
+                <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{{ url_for('view_summary', doc_id=document.id) }}" class="sf-btn sf-btn-primary w-100 justify-content-center">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        View AI Summary
+                    </a>
+                    <a href="{{ url_for('chat', doc_id=document.id) }}" class="sf-btn sf-btn-success w-100 justify-content-center">
+                        <i class="fas fa-message"></i>
+                        Ask Questions
+                    </a>
+                    <a href="{{ url_for('generate_quiz_route', doc_id=document.id) }}" class="sf-btn sf-btn-warning w-100 justify-content-center">
+                        <i class="fas fa-clipboard-question"></i>
+                        Generate Quiz
+                    </a>
+                </div>
+            </div>
+
+            <div class="sf-card">
+                <div class="sf-card-header">
+                    <h6 style="margin: 0; font-weight: 600;">Document Info</h6>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Uploaded</span>
+                        <span style="font-weight: 500; font-size: 0.85rem;">{{ document.created_at }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Format</span>
+                        <span class="sf-badge sf-badge-primary">{{ document.file_type.upper() }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Status</span>
+                        <span class="sf-badge sf-badge-success">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

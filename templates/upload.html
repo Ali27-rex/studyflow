@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Upload — StudyFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center reveal">
+    <div class="col-md-8 col-lg-6">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <h1 class="page-title" style="justify-content: center;">Upload Material</h1>
+            <p style="color: var(--text-muted);">Add lecture notes to generate summaries and quizzes</p>
+        </div>
+
+        <div class="sf-card">
+            <div class="sf-card-body" style="padding: 40px;">
+                <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-zone mb-4" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" name="file" id="fileInput" accept=".pdf,.docx,.doc,.txt,.epub,.png,.jpg,.jpeg,.gif,.bmp,.webp,.tiff" style="display: none;" required>
+
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #eff6ff, #f5f3ff); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--accent); font-size: 1.5rem;">
+                            <i class="fas fa-cloud-arrow-up" id="uploadIcon"></i>
+                        </div>
+
+                        <h5 style="margin-bottom: 8px; font-weight: 600;">Drop your file here</h5>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 4px;">or click to browse files</p>
+                        <p style="color: var(--text-muted); font-size: 0.75rem;">PDF, DOCX, TXT, EPUB, Images (PNG, JPG, JPEG, GIF, BMP, WEBP, TIFF)</p>
+
+                        <div id="filePreview" style="display: none; margin-top: 20px; padding: 12px 16px; background: var(--bg-elevated); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: #fef2f2; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--danger);">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div style="flex: 1; text-align: left;">
+                                <div id="fileName" style="font-weight: 600; font-size: 0.9rem;"></div>
+                                <div id="fileSize" style="font-size: 0.75rem; color: var(--text-muted);"></div>
+                            </div>
+                            <button type="button" onclick="event.stopPropagation(); clearFile()" style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                                <i class="fas fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="loadingState" style="display: none; text-align: center; padding: 20px;">
+                        <div style="width: 48px; height: 48px; border: 3px solid var(--border-subtle); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                        <p style="font-weight: 600; margin-bottom: 4px;">Processing your document...</p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Extracting text and generating AI summary</p>
+                    </div>
+
+                    <button type="submit" class="sf-btn sf-btn-primary w-100 py-3" id="submitBtn">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload & Analyze</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const filePreview = document.getElementById('filePreview');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const uploadIcon = document.getElementById('uploadIcon');
+
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        showFile(this.files[0]);
+    }
+});
+
+function showFile(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    filePreview.style.display = 'flex';
+    dropZone.style.borderColor = 'transparent';
+    uploadIcon.className = 'fas fa-check';
+    uploadIcon.parentElement.style.background = 'linear-gradient(135deg, #d1fae5, #ecfdf5)';
+    uploadIcon.parentElement.style.color = 'var(--success)';
+}
+
+function clearFile() {
+    fileInput.value = '';
+    filePreview.style.display = 'none';
+    dropZone.style.borderColor = '';
+    uploadIcon.className = 'fas fa-cloud-arrow-up';
+    uploadIcon.parentElement.style.background = '';
+    uploadIcon.parentElement.style.color = '';
+}
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
+});
+
+dropZone.addEventListener('drop', function(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+        fileInput.files = files;
+        showFile(files[0]);
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    dropZone.style.opacity = '0.5';
+    dropZone.style.pointerEvents = 'none';
+});
+</script>
+{% endblock %}
